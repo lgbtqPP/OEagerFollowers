@@ -154,6 +154,8 @@ actor playerRef
 
 OsexIntegrationMain ostim
 
+Message Property OEFPlayerAccept Auto
+
 ReferenceAlias Nav1
 ReferenceAlias Nav2
 ReferenceAlias TargetRef
@@ -198,6 +200,7 @@ Event OnInit()
 EndEvent
 
 Function OnLoad()
+	playerRef = game.GetPlayer()
 	RegisterForSingleUpdate(ScanFreq)
 EndFunction
 
@@ -315,6 +318,13 @@ EndFunction
 Actor Function FindCompatiblePartner(actor act)
 	oefConsole(1, "Getting partner for " + act.GetDisplayName())
 
+	if AllowPlayer && CompatibleRelationship(act, playerRef) && OStim.RandomInt(0,100) < PlayerChance
+		int PlayerAccept = OEFPlayerAccept.show()
+		if PlayerAccept == 0
+			return playerRef
+		endif
+	endif
+
 	actors = ShuffleActorArray(actors)
 
 	int i = 0
@@ -342,7 +352,7 @@ EndFunction
 ; float targetDistance = 256.0
 
 Function DoSex(actor dom, actor sub)
- 	storyNotification(dom.GetDisplayName() + " is having sex with " + sub.GetDisplayName())
+ 	;storyNotification(dom.GetDisplayName() + " is having sex with " + sub.GetDisplayName())
 ; 	If IsInBed(dom)
 
 ; 		if !IsInBed(sub) || (dom.GetDistance(sub) > 400)
@@ -514,7 +524,9 @@ EndFunction
 ; EndFunction
 
 Bool Function IsActorInvalid(actor act)
-	If  (act == none) || (act.IsInCombat()) || (act.IsGhost()) || (act.IsDead())  || (act.IsDisabled())|| !(act.is3dloaded()) || ostim.IsChild(act) || !(act.GetRace().HasKeyword(Keyword.GetKeyword("ActorTypeNPC"))) || act.IsInDialogueWithPlayer() || ostim.IsActorActive(act)
+	If  (act == none)
+		oefConsole(3, "Invalid: is none")
+	elseif (act == playerRef) || (act.IsInCombat()) || (act.IsGhost()) || (act.IsDead())  || (act.IsDisabled())|| !(act.is3dloaded()) || ostim.IsChild(act) || !(act.GetRace().HasKeyword(Keyword.GetKeyword("ActorTypeNPC"))) || act.IsInDialogueWithPlayer() || ostim.IsActorActive(act)
 		oefConsole(3, "Invalid: " + act.GetDisplayName())
 		return true
 	else
