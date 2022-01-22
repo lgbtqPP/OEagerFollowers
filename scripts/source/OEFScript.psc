@@ -104,7 +104,7 @@ function storyNotification(string msg)
 EndFunction
 
 function storyFinding(actor act)
-	int i = ostim.RandomInt(0,4)
+	int i = Utility.RandomInt(0,3)
 	string finding_string = ""
 	if i == 0
 		finding_string = " wants to fuck somebody"
@@ -119,7 +119,7 @@ function storyFinding(actor act)
 EndFunction
 
 function storyFound(actor act, actor partner)
-	int i = ostim.RandomInt(4)
+	int i = Utility.RandomInt(0,3)
 	string found_string = ""
 	if i == 0
 		found_string = act.GetDisplayName() + " is having sex with " + partner.GetDisplayName()
@@ -134,7 +134,7 @@ function storyFound(actor act, actor partner)
 endfunction
 
 function storyNotFound(actor act)
-	int i = ostim.RandomInt(4)
+	int i = Utility.RandomInt(0,3)
 	string notfound_string = ""
 	if i == 0
 		notfound_string = "Bummer! " + act.GetDisplayName() + " didn't find anybody worthwhile"
@@ -268,7 +268,7 @@ EndFunction
 ; 		i += 1
 ; 	endwhile
 ; 	i = 0
-; 	int s = OStim.RandomInt(0, arrSum)
+; 	int s = Utility.RandomInt(0, arrSum)
 ; 	while i < l && s < arr[i]
 ; 		s -= arr[i]
 ; 		i += 1
@@ -284,7 +284,7 @@ Actor[] Function ShuffleActorArray(Actor[] arr)
     actor temp
     While (i > 0)
         i -= 1
-        j = OStim.RandomInt(0, i)
+        j = Utility.RandomInt(0, i)
 
         temp = arr[i]
         arr[i] = arr[j]
@@ -319,7 +319,7 @@ EndFunction
 Actor Function FindCompatiblePartner(actor act)
 	oefConsole(1, "Getting partner for " + act.GetDisplayName())
 
-	if AllowPlayer && CompatibleRelationship(act, playerRef) && OStim.RandomInt(0,100) < PlayerChance
+	if AllowPlayer && CompatibleRelationship(act, playerRef) && Utility.RandomInt(0,100) < PlayerChance
 		int PlayerAccept = OEFPlayerAccept.show()
 		if PlayerAccept == 0
 			return playerRef
