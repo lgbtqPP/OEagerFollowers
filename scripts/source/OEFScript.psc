@@ -201,6 +201,7 @@ EndEvent
 
 Function OnLoad()
 	playerRef = game.GetPlayer()
+	ReadConfig()
 	RegisterForSingleUpdate(ScanFreq)
 EndFunction
 
@@ -498,8 +499,8 @@ EndFunction
 ; 	endif 
 ; EndFunction
 
-; ObjectReference Function FindBed(ObjectReference CenterRef, Float Radius = 0.0, bool AllowUsed = false)
-; 	objectreference[] Beds = OSANative.FindBed(CenterRef, Radius, 1000.0)
+; ObjectReference Function FindBed(bool AllowUsed = false)
+; 	objectreference[] Beds = OSANative.FindBed(playerRef, Radius, 1000.0)
 
 ; 	ObjectReference NearRef = None
 
