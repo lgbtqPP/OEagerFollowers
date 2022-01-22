@@ -256,25 +256,28 @@ Function ScanForSex()
  	scanning = false
 EndFunction
 
-; int Function WeightedSelect(int[] arr)
-; 	int l = arr.length
-; 	int i = 0
-; 	if l == 0
-; 		return -1
-; 	endif
-; 	int arrSum = 0
-; 	while i < l 
-; 		arrSum += arr[i]
-; 		i += 1
-; 	endwhile
-; 	i = 0
-; 	int s = Utility.RandomInt(0, arrSum)
-; 	while i < l && s < arr[i]
-; 		s -= arr[i]
-; 		i += 1
-; 	endwhile
-; 	return i
-; EndFunction
+int Function WeightedSelect(int[] arr)
+	int l = arr.length
+	int i = 0
+	if l == 0
+		return -1
+	endif
+	int arrSum = 0
+	while i < l
+		arrSum += arr[i]
+		i += 1
+	endwhile
+	if arrSum == 0
+		return -1
+	endif
+	i = 0
+	int s = Utility.RandomInt(0, arrSum - 1)
+	while i < l && s < arr[i]
+		s -= arr[i]
+		i += 1
+	endwhile
+	return i
+EndFunction
 
 Actor[] Function ShuffleActorArray(Actor[] arr)
     
