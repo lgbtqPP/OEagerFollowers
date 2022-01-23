@@ -173,16 +173,10 @@ bool scanning = false
 
 ; init
 Event OnInit()
-	OnLoad()
-EndEvent
-
-Function OnLoad()
-	oefNotification(0, "Initializing...")
 	ostim = game.GetFormFromFile(0x000801, "Ostim.esp") as OsexIntegrationMain
 
 	if ostim.getAPIVersion() < 13
-		oefNotification(0, "OStim version is out of date and not supported.")
-		return
+		oefMessage(0, "OStim version is out of date and not supported.")
 	endif
 
 	playerRef = game.GetPlayer()
@@ -200,10 +194,15 @@ Function OnLoad()
 	RegisterForModEvent("ostim_start", "OstimStart")
 	RegisterForModEvent("ostim_end", "OstimEnd")
 
+	oefNotification(0, "Initialized")
+
+	OnLoad()
+EndEvent
+
+Function OnLoad()
+	playerRef = game.GetPlayer()
 	ReadConfig()
 	RegisterForSingleUpdate(ScanFreq)
-
-	oefNotification(0, "Initialized")
 EndFunction
 
 Event OStimStart(string eventName, string strArg, float numArg, Form sender)
@@ -554,22 +553,10 @@ EndFunction
 ; 	Return None ; Nothing found in search loop
 ; EndFunction
 
-bool Function IsChild(actor act) Global
-	if act.IsChild()
-		return true
-	else 
-		Race ActorRace  = act.GetLeveledActorBase().GetRace()
-		string RaceName = act.GetName() + MiscUtil.GetRaceEditorID(ActorRace)
-		return StringContains(RaceName, "Child")
-	endif
-EndFunction 
-
 Bool Function IsActorInvalid(actor act)
 	If  (act == none)
 		oefConsole(3, "Invalid: is none")
-	elseif (IsChild(act))
-		oefConsole(3, "Invalid: is child")
-	elseif (act == playerRef) || (act.IsInCombat()) || (act.IsGhost()) || (act.IsDead())  || (act.IsDisabled())|| !(act.is3dloaded()) || !(act.GetRace().HasKeyword(Keyword.GetKeyword("ActorTypeNPC"))) || act.IsInDialogueWithPlayer() || ostim.IsActorActive(act)
+	elseif (act == playerRef) || (act.IsInCombat()) || (act.IsGhost()) || (act.IsDead())  || (act.IsDisabled())|| !(act.is3dloaded()) || ostim.IsChild(act) || !(act.GetRace().HasKeyword(Keyword.GetKeyword("ActorTypeNPC"))) || act.IsInDialogueWithPlayer() || ostim.IsActorActive(act)
 		oefConsole(3, "Invalid: " + act.GetDisplayName())
 		return true
 	else
