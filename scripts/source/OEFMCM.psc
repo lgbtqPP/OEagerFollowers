@@ -45,7 +45,7 @@ Event OnPageReset(string page)
 
 		SetCursorPosition(1) 
 
-		AddHeaderOption("sexuality")
+		AddHeaderOption("categories")
 		OID_WT_FF = AddSliderOption("F-F weight", OEFWT_FF.GetValue(), "{0}")
 		OID_WT_MF = AddSliderOption("M-F weight", OEFWT_MF.GetValue(), "{0}")
 		OID_WT_MM = AddSliderOption("M-M weight", OEFWT_MM.GetValue(), "{0}")
