@@ -22,7 +22,7 @@ float PlayerChance
 bool UseRelationship
 float MaxGroups
 float SearchRadius
-float[] GroupWeights
+int[] GroupWeights
 
 float Function GetDebugLevel()
 	return OEFDebugLevel.GetValue()
@@ -56,11 +56,11 @@ float Function GetSearchRadius()
 	return OEFSearchRadius.GetValue()
 EndFunction
 
-Float[] Function GetGroupWeights()
-	float[] weights = new Float[3]
-	weights[0] = OEFWT_MM.GetValue()
-	weights[1] = OEFWT_FF.GetValue()
-	weights[2] = OEFWT_MF.GetValue()
+Int[] Function GetGroupWeights()
+	Int[] weights = new Int[3]
+	weights[0] = OEFWT_FF.GetValue() as int
+	weights[1] = OEFWT_MF.GetValue() as int
+	weights[2] = OEFWT_MM.GetValue() as int
 	return weights
 EndFunction
 
@@ -238,20 +238,42 @@ EndFunction
 Function ScanForSex()
  	oefConsole(1, "Starting a scan")
  	scanning = True
- 	actor act = GetRandomFollower()
- 	If act
- 		oefConsole(1, "Found actor " + act.GetDisplayName())
-		storyFinding(act)
-		actor partner  = FindCompatiblePartner(act) ;, AllowPlayer, PlayerChance, UseRelationship)
-		if partner 
-			oefConsole(1, "Found partner " + partner.GetDisplayName())
-			storyFound(act, partner) ;.GetDisplayName() + " is eyeing " + partner.GetDisplayName())
-			doSex(act, partner)
+ 	int sexType = WeightedSelect(GroupWeights)
+ 	oefConsole(5, "Sex type = " + (sexType as string))
+ 	if sexType != -1
+ 		bool isFemaleA
+ 		bool isFemaleB
+ 		if sexType == 0
+ 			isFemaleA = True
+ 			isFemaleB = True
+ 		elseif sexType == 1
+ 			if Utility.RandomInt(0,1) == 0
+ 				isFemaleA = True
+ 				isFemaleB = False
+ 			Else
+ 				isFemaleA = False
+ 				isFemaleB = True
+ 			endif
+ 		Else
+ 			isFemaleA = False
+ 			isFemaleB = False
+ 		endif
+ 		oefConsole(1, "Finding an actor with gender: " + (isFemaleA as string))
+		actor act = GetRandomFollower(isFemaleA)
+	 	If act
+	 		oefConsole(1, "Found actor " + act.GetDisplayName())
+			storyFinding(act)
+			actor partner  = FindCompatiblePartner(act, isFemaleB) ;, AllowPlayer, PlayerChance, UseRelationship)
+			if partner 
+				oefConsole(1, "Found partner " + partner.GetDisplayName())
+				storyFound(act, partner) ;.GetDisplayName() + " is eyeing " + partner.GetDisplayName())
+				doSex(act, partner)
+			Else
+				oefConsole(1, "Could not find any partner")
+			endif
 		Else
-			oefConsole(1, "Could not find any partner")
+			oefConsole(1, "Could not find any actor")
 		endif
-	Else
-		oefConsole(1, "Could not find any actor")
 	endif
  	scanning = false
 EndFunction
@@ -272,9 +294,11 @@ int Function WeightedSelect(int[] arr)
 	endif
 	i = 0
 	int s = Utility.RandomInt(0, arrSum - 1)
-	while i < l && s < arr[i]
+	;oefConsole(5, "arr = " + (arr as string) + " arrsum = " + (arrSum as string) + ", s = " + (s as string))
+	while i < l && s >= arr[i]
 		s -= arr[i]
 		i += 1
+		;oefConsole(5, "s = " + (s as string) + ", i = " + (i as string))
 	endwhile
 	return i
 EndFunction
@@ -297,7 +321,11 @@ Actor[] Function ShuffleActorArray(Actor[] arr)
     return arr
 EndFunction
 
-Actor Function GetRandomFollower()
+bool Function isFemale(actor act)
+	return (act.GetLeveledActorBase().GetSex() == 1)
+EndFunction
+
+Actor Function GetRandomFollower(bool isFemaleAct = True)
 	if AllowNPC
 		actors = MiscUtil.ScanCellNPCs(CenterOn = playerRef, radius = SearchRadius)
 	else
@@ -307,22 +335,20 @@ Actor Function GetRandomFollower()
 	int i = 0
 	int l = actors.length 
 	While i < l 
-		If !IsActorInvalid(actors[i]) && !(actors[i] == playerRef)
-			actor cact = actors[i]
+		actor cact = actors[i]
+		If !IsActorInvalid(cact) && !(cact == playerRef) && (isFemaleAct == isFemale(cact))
 			actors[i] = none
 			return cact
-		else
-			actors[i] = none
 		endif
 		i += 1
 	EndWhile
 	return none
 EndFunction
 
-Actor Function FindCompatiblePartner(actor act)
-	oefConsole(1, "Getting partner for " + act.GetDisplayName())
+Actor Function FindCompatiblePartner(actor act, bool isFemaleAct = True)
+	oefConsole(1, "Getting partner for " + act.GetDisplayName() + " with gender: " + (isFemaleAct as string))
 
-	if AllowPlayer && CompatibleRelationship(act, playerRef) && Utility.RandomInt(0,100) < PlayerChance
+	if AllowPlayer && isFemaleAct == isFemale(playerRef) && CompatibleRelationship(act, playerRef) && Utility.RandomInt(0,100) < PlayerChance
 		int PlayerAccept = OEFPlayerAccept.show()
 		if PlayerAccept == 0
 			return playerRef
@@ -337,7 +363,7 @@ Actor Function FindCompatiblePartner(actor act)
 	actor partner
 	While i < l 
 		partner = actors[i]
-		if !IsActorInValid(partner) && (AllowPlayer || partner != playerRef) && (!UseRelationship || CompatibleRelationship(act, partner))
+		if (partner != playerRef) && !IsActorInValid(partner) && (isFemaleAct == isFemale(partner)) && (!UseRelationship || CompatibleRelationship(act, partner))
 			return partner
 		endif
 		i += 1
