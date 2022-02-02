@@ -12,12 +12,13 @@ GlobalVariable Property OEFSearchRadius Auto
 GlobalVariable Property OEFWT_MM Auto
 GlobalVariable Property OEFWT_FF Auto
 GlobalVariable Property OEFWT_MF Auto
-
+GlobalVariable Property OEFImmersive Auto
 
 float DebugLevel
 float ScanFreq
 bool AllowPlayer
 bool AllowNPC
+bool ShowNotifications
 float PlayerChance
 bool UseRelationship
 float MaxGroups
@@ -38,6 +39,10 @@ EndFunction
 
 bool Function GetAllowNPC()
 	return (OEFAllowNPC.GetValue() == 1)
+EndFunction
+
+bool Function GetImmersive()
+	return (OEFImmersive.GetValue() == 1)
 EndFunction
 
 float Function GetPlayerChance()
@@ -65,6 +70,7 @@ Int[] Function GetGroupWeights()
 EndFunction
 
 Function ReadConfig()
+	ShowNotifications = false
 	DebugLevel = GetDebugLevel()
 	ScanFreq = GetScanFreq()
 	AllowPlayer = GetAllowPlayer()
@@ -100,7 +106,9 @@ EndFunction
 
 ;;;;; story messaging
 function storyNotification(string msg)
-	debug.Notification(msg)
+	if !GetImmersive()
+		debug.Notification(msg)
+	endif
 EndFunction
 
 function storyFinding(actor act)
@@ -231,7 +239,12 @@ Event OnUpdate()
 EndEvent
 
 Function OnLocChange(Location NewLoc)
- 	oefConsole(3, "Changed location to " + NewLoc.GetName())
+	if NewLoc
+	 	oefConsole(3, "Changed location to " + NewLoc.GetName())
+	else
+		oefConsole(3, "Changed location")
+	endif
+
  	RegisterForSingleUpdate(ScanFreq)
 EndFunction
 

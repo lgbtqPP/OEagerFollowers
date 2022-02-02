@@ -12,11 +12,13 @@ GlobalVariable Property OEFSearchRadius Auto
 GlobalVariable Property OEFWT_MM Auto
 GlobalVariable Property OEFWT_FF Auto
 GlobalVariable Property OEFWT_MF Auto
+GlobalVariable Property OEFImmersive Auto
 
 Int OID_DebugLevel
 Int OID_ScanFreq
 Int OID_AllowPlayer
 Int OID_AllowNPC
+Int OID_Immersive
 Int OID_PlayerChance
 Int OID_UseRelationship
 Int OID_MaxGroups
@@ -33,6 +35,7 @@ Event OnPageReset(string page)
 
 		AddHeaderOption("general")
 		OID_AllowNPC = AddToggleOption("Allow non-follower NPCs", OEFAllowNPC.GetValue())
+		OID_Immersive = AddToggleOption("Immersive Mode", OEFImmersive.GetValue())
 		OID_UseRelationship = AddToggleOption("Use NPC-NPC relationship values", OEFUseRelationship.GetValue())
 		OID_MaxGroups = AddSliderOption("Max groups allowed", OEFMaxGroups.GetValue(), "{0}")
 		OID_SearchRadius = AddSliderOption("Radius to search for available NPCs", OEFSearchRadius.GetValue())
@@ -71,6 +74,9 @@ Event OnOptionSelect(Int option)
     elseif (option == OID_AllowNPC)
     	OEFAllowNPC.SetValue(1 - OEFAllowNPC.GetValue())
     	SetToggleOptionValue(OID_AllowNPC, OEFAllowNPC.GetValue())
+    elseif (option == OID_Immersive)
+    	OEFImmersive.SetValue(1 - OEFImmersive.GetValue())
+    	SetToggleOptionValue(OID_Immersive, OEFImmersive.GetValue())
 	elseif (option == OID_UseRelationship)
         OEFUseRelationship.SetValue(1 - OEFUseRelationship.GetValue())
         SetToggleOptionValue(OID_UseRelationship, OEFUseRelationship.GetValue())
