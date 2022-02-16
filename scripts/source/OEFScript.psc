@@ -70,7 +70,7 @@ Int[] Function GetGroupWeights()
 EndFunction
 
 Function ReadConfig()
-	ShowNotifications = false
+	ShowNotifications = GetImmersive()
 	DebugLevel = GetDebugLevel()
 	ScanFreq = GetScanFreq()
 	AllowPlayer = GetAllowPlayer()
@@ -106,7 +106,7 @@ EndFunction
 
 ;;;;; story messaging
 function storyNotification(string msg)
-	if !GetImmersive()
+	if !ShowNotifications
 		debug.Notification(msg)
 	endif
 EndFunction
